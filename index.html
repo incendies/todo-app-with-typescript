@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript Todo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .delete {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>TypeScript Todo List</h1>
+    <input type="text" id="newItem" placeholder="Enter a new item">
+    <button id="addItem">Add Item</button>
+    <ul id="itemList"></ul>
+
+    <script src="dist/app.js"></script>
+</body>
+</html>
