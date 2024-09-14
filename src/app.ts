@@ -2,8 +2,8 @@ interface TodoItem {
     id: number;
     text: string;
     completed: boolean;
+    editing?: boolean; // New field for editing state
 }
-
 
 class TodoList {
     private items: TodoItem[] = [];
@@ -23,6 +23,7 @@ class TodoList {
             return;
         }
 
+        this.loadFromLocalStorage();
         this.addItemButton.addEventListener('click', () => this.addItem());
         this.newItemInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -30,6 +31,7 @@ class TodoList {
             }
         });
         console.log('Event listeners added');
+        this.renderList();
     }
 
     private addItem(): void {
@@ -42,6 +44,7 @@ class TodoList {
                 completed: false
             };
             this.items.push(newItem);
+            this.saveToLocalStorage();
             this.renderList();
             this.newItemInput.value = '';
         }
@@ -51,13 +54,33 @@ class TodoList {
         const item = this.items.find(item => item.id === id);
         if (item) {
             item.completed = !item.completed;
+            this.saveToLocalStorage();
             this.renderList();
         }
     }
 
     private deleteItem(id: number): void {
         this.items = this.items.filter(item => item.id !== id);
+        this.saveToLocalStorage();
         this.renderList();
+    }
+
+    private startEdit(id: number): void {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            item.editing = true;
+            this.renderList();
+        }
+    }
+
+    private saveEdit(id: number, newText: string): void {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            item.text = newText;
+            item.editing = false;
+            this.saveToLocalStorage();
+            this.renderList();
+        }
     }
 
     private renderList(): void {
@@ -69,20 +92,55 @@ class TodoList {
         this.itemList.innerHTML = '';
         this.items.forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `
-                <input type="checkbox" ${item.completed ? 'checked' : ''}>
-                <span class="${item.completed ? 'completed' : ''}">${item.text}</span>
-                <button class="delete">Delete</button>
-            `;
-            
-            const checkbox = li.querySelector('input') as HTMLInputElement;
-            checkbox.addEventListener('change', () => this.toggleComplete(item.id));
 
-            const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
-            deleteButton.addEventListener('click', () => this.deleteItem(item.id));
+            if (item.editing) {
+                li.innerHTML = `
+                    <input type="text" value="${item.text}" class="edit-text">
+                    <button class="save">Save</button>
+                    <button class="cancel">Cancel</button>
+                `;
+                const saveButton = li.querySelector('.save') as HTMLButtonElement;
+                saveButton.addEventListener('click', () => {
+                    const input = li.querySelector('.edit-text') as HTMLInputElement;
+                    this.saveEdit(item.id, input.value);
+                });
+
+                const cancelButton = li.querySelector('.cancel') as HTMLButtonElement;
+                cancelButton.addEventListener('click', () => {
+                    item.editing = false;
+                    this.renderList();
+                });
+            } else {
+                li.innerHTML = `
+                    <input type="checkbox" ${item.completed ? 'checked' : ''}>
+                    <span class="${item.completed ? 'completed' : ''}">${item.text}</span>
+                    <button class="edit">Edit</button>
+                    <button class="delete">Delete</button>
+                `;
+                const checkbox = li.querySelector('input') as HTMLInputElement;
+                checkbox.addEventListener('change', () => this.toggleComplete(item.id));
+
+                const editButton = li.querySelector('.edit') as HTMLButtonElement;
+                editButton.addEventListener('click', () => this.startEdit(item.id));
+
+                const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
+                deleteButton.addEventListener('click', () => this.deleteItem(item.id));
+            }
 
             this.itemList.appendChild(li);
         });
+    }
+
+    private saveToLocalStorage(): void {
+        localStorage.setItem('todoItems', JSON.stringify(this.items));
+    }
+
+    private loadFromLocalStorage(): void {
+        const savedItems = localStorage.getItem('todoItems');
+        if (savedItems) {
+            this.items = JSON.parse(savedItems);
+            this.nextId = this.items.length ? Math.max(...this.items.map(item => item.id)) + 1 : 1;
+        }
     }
 }
 
