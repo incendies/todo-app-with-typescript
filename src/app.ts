@@ -2,7 +2,8 @@ interface TodoItem {
     id: number;
     text: string;
     completed: boolean;
-    editing?: boolean; // New field for editing state
+    dueDate?: string;
+    editing?: boolean;
 }
 
 class TodoList {
@@ -37,18 +38,22 @@ class TodoList {
     private addItem(): void {
         console.log('addItem called');
         const newItemText = this.newItemInput.value.trim();
+        const dueDateInput = (document.getElementById('dueDate') as HTMLInputElement).value;
+    
         if (newItemText) {
             const newItem: TodoItem = {
                 id: this.nextId++,
                 text: newItemText,
-                completed: false
+                completed: false,
+                dueDate: dueDateInput ? dueDateInput : undefined  // Use undefined if no date is provided
             };
             this.items.push(newItem);
             this.saveToLocalStorage();
             this.renderList();
             this.newItemInput.value = '';
+            (document.getElementById('dueDate') as HTMLInputElement).value = '';  // Clear date input
         }
-    }
+    }    
 
     private toggleComplete(id: number): void {
         const item = this.items.find(item => item.id === id);
@@ -65,24 +70,6 @@ class TodoList {
         this.renderList();
     }
 
-    private startEdit(id: number): void {
-        const item = this.items.find(item => item.id === id);
-        if (item) {
-            item.editing = true;
-            this.renderList();
-        }
-    }
-
-    private saveEdit(id: number, newText: string): void {
-        const item = this.items.find(item => item.id === id);
-        if (item) {
-            item.text = newText;
-            item.editing = false;
-            this.saveToLocalStorage();
-            this.renderList();
-        }
-    }
-
     private renderList(): void {
         console.log('renderList called');
         if (!this.itemList) {
@@ -93,39 +80,22 @@ class TodoList {
         this.items.forEach(item => {
             const li = document.createElement('li');
 
-            if (item.editing) {
-                li.innerHTML = `
-                    <input type="text" value="${item.text}" class="edit-text">
-                    <button class="save">Save</button>
-                    <button class="cancel">Cancel</button>
-                `;
-                const saveButton = li.querySelector('.save') as HTMLButtonElement;
-                saveButton.addEventListener('click', () => {
-                    const input = li.querySelector('.edit-text') as HTMLInputElement;
-                    this.saveEdit(item.id, input.value);
-                });
+            const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
+            const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
 
-                const cancelButton = li.querySelector('.cancel') as HTMLButtonElement;
-                cancelButton.addEventListener('click', () => {
-                    item.editing = false;
-                    this.renderList();
-                });
-            } else {
-                li.innerHTML = `
-                    <input type="checkbox" ${item.completed ? 'checked' : ''}>
-                    <span class="${item.completed ? 'completed' : ''}">${item.text}</span>
-                    <button class="edit">Edit</button>
-                    <button class="delete">Delete</button>
-                `;
-                const checkbox = li.querySelector('input') as HTMLInputElement;
-                checkbox.addEventListener('change', () => this.toggleComplete(item.id));
+            li.innerHTML = `
+                <input type="checkbox" ${item.completed ? 'checked' : ''}>
+                <span class="${item.completed ? 'completed' : ''}">${item.text}</span>
+                ${dueDateLabel}
+                <button class="edit">Edit</button>
+                <button class="delete">Delete</button>
+            `;
+            
+            const checkbox = li.querySelector('input') as HTMLInputElement;
+            checkbox.addEventListener('change', () => this.toggleComplete(item.id));
 
-                const editButton = li.querySelector('.edit') as HTMLButtonElement;
-                editButton.addEventListener('click', () => this.startEdit(item.id));
-
-                const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
-                deleteButton.addEventListener('click', () => this.deleteItem(item.id));
-            }
+            const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
+            deleteButton.addEventListener('click', () => this.deleteItem(item.id));
 
             this.itemList.appendChild(li);
         });

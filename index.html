@@ -25,11 +25,20 @@
         .delete {
             margin-left: 10px;
         }
+        .due-date {
+        margin-left: 10px;
+        font-size: 0.9em;
+        color: #666;
+ }
+        .overdue {
+        color: red;
+        }
     </style>
 </head>
 <body>
     <h1>TypeScript Todo List</h1>
     <input type="text" id="newItem" placeholder="Enter a new item">
+    <input type="date" id="dueDate" placeholder="Due date">
     <button id="addItem">Add Item</button>
     <ul id="itemList"></ul>
 
