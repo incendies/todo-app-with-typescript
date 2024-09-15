@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "lite-server",
+    "start": "live-server --watch=dist --port=3000",
     "watch": "tsc -w"
   },
   "keywords": [],
@@ -12,7 +12,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "lite-server": "^2.6.1",
+    "live-server": "^1.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }

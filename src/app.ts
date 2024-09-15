@@ -4,6 +4,7 @@ interface TodoItem {
     completed: boolean;
     dueDate?: string;
     editing?: boolean;
+    priority: string;
 }
 
 class TodoList {
@@ -39,19 +40,22 @@ class TodoList {
         console.log('addItem called');
         const newItemText = this.newItemInput.value.trim();
         const dueDateInput = (document.getElementById('dueDate') as HTMLInputElement).value;
+        const priorityInput = (document.getElementById('priority') as HTMLInputElement).value;
     
         if (newItemText) {
             const newItem: TodoItem = {
                 id: this.nextId++,
                 text: newItemText,
                 completed: false,
-                dueDate: dueDateInput ? dueDateInput : undefined  // Use undefined if no date is provided
+                dueDate: dueDateInput ? dueDateInput : undefined,  // Use undefined if no date is provided
+                priority: priorityInput
             };
             this.items.push(newItem);
             this.saveToLocalStorage();
             this.renderList();
             this.newItemInput.value = '';
             (document.getElementById('dueDate') as HTMLInputElement).value = '';  // Clear date input
+            (document.getElementById('priority') as HTMLInputElement).value = 'low';  // Clear priority input
         }
     }    
 
@@ -79,27 +83,30 @@ class TodoList {
         this.itemList.innerHTML = '';
         this.items.forEach(item => {
             const li = document.createElement('li');
-
+    
             const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
             const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
-
+            
+            const priorityClass = `priority-${item.priority.toLowerCase()}`;  // Set priority-based class
+            
             li.innerHTML = `
                 <input type="checkbox" ${item.completed ? 'checked' : ''}>
-                <span class="${item.completed ? 'completed' : ''}">${item.text}</span>
+                <span class="${item.completed ? 'completed' : ''} ${priorityClass}">${item.text}</span>
                 ${dueDateLabel}
+                <span class="priority-label">[${item.priority}]</span>  <!-- Display priority -->
                 <button class="edit">Edit</button>
                 <button class="delete">Delete</button>
             `;
             
             const checkbox = li.querySelector('input') as HTMLInputElement;
             checkbox.addEventListener('change', () => this.toggleComplete(item.id));
-
+    
             const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
             deleteButton.addEventListener('click', () => this.deleteItem(item.id));
-
+    
             this.itemList.appendChild(li);
         });
-    }
+    }    
 
     private saveToLocalStorage(): void {
         localStorage.setItem('todoItems', JSON.stringify(this.items));

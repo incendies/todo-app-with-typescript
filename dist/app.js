@@ -25,18 +25,21 @@ class TodoList {
         console.log('addItem called');
         const newItemText = this.newItemInput.value.trim();
         const dueDateInput = document.getElementById('dueDate').value;
+        const priorityInput = document.getElementById('priority').value;
         if (newItemText) {
             const newItem = {
                 id: this.nextId++,
                 text: newItemText,
                 completed: false,
-                dueDate: dueDateInput ? dueDateInput : undefined // Use undefined if no date is provided
+                dueDate: dueDateInput ? dueDateInput : undefined, // Use undefined if no date is provided
+                priority: priorityInput
             };
             this.items.push(newItem);
             this.saveToLocalStorage();
             this.renderList();
             this.newItemInput.value = '';
             document.getElementById('dueDate').value = ''; // Clear date input
+            document.getElementById('priority').value = 'low'; // Clear priority input
         }
     }
     toggleComplete(id) {
@@ -63,10 +66,12 @@ class TodoList {
             const li = document.createElement('li');
             const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
             const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
+            const priorityClass = `priority-${item.priority.toLowerCase()}`; // Set priority-based class
             li.innerHTML = `
                 <input type="checkbox" ${item.completed ? 'checked' : ''}>
-                <span class="${item.completed ? 'completed' : ''}">${item.text}</span>
+                <span class="${item.completed ? 'completed' : ''} ${priorityClass}">${item.text}</span>
                 ${dueDateLabel}
+                <span class="priority-label">[${item.priority}]</span>  <!-- Display priority -->
                 <button class="edit">Edit</button>
                 <button class="delete">Delete</button>
             `;
