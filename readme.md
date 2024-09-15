@@ -1,3 +1,5 @@
+![Typescript Todo Demo](./typescript-todo-list.jpeg)
+
 # TypeScript Web App
 
 This is a basic web application built with TypeScript and Express.js. It serves as a starting point for developing more complex web applications using TypeScript.
