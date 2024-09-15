@@ -1,8 +1,8 @@
 ![Typescript Todo Demo](./typescript-todo-list.jpeg)
 
-# TypeScript Web App
+# TypeScript ToDo App
 
-This is a basic web application built with TypeScript and Express.js. It serves as a starting point for developing more complex web applications using TypeScript.
+This is a basic todo web application built with TypeScript. It serves as a starting point for developing more complex web applications using TypeScript.
 
 ## Prerequisites
 
