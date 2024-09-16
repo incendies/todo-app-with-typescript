@@ -7,7 +7,11 @@ class TodoList {
         this.itemList = document.getElementById('itemList');
         this.newItemInput = document.getElementById('newItem');
         this.addItemButton = document.getElementById('addItem');
-        if (!this.itemList || !this.newItemInput || !this.addItemButton) {
+        this.dueDateInput = document.getElementById('dueDate');
+        this.priorityInput = document.getElementById('priority');
+        this.filterSelect = document.getElementById('filter');
+        this.sortSelect = document.getElementById('sort');
+        if (!this.itemList || !this.newItemInput || !this.addItemButton || !this.dueDateInput || !this.priorityInput || !this.filterSelect || !this.sortSelect) {
             console.error('One or more elements not found');
             return;
         }
@@ -18,28 +22,30 @@ class TodoList {
                 this.addItem();
             }
         });
+        this.filterSelect.addEventListener('change', () => this.renderList());
+        this.sortSelect.addEventListener('change', () => this.renderList());
         console.log('Event listeners added');
         this.renderList();
     }
     addItem() {
         console.log('addItem called');
         const newItemText = this.newItemInput.value.trim();
-        const dueDateInput = document.getElementById('dueDate').value;
-        const priorityInput = document.getElementById('priority').value;
+        const dueDate = this.dueDateInput.value;
+        const priority = this.priorityInput.value;
         if (newItemText) {
             const newItem = {
                 id: this.nextId++,
                 text: newItemText,
                 completed: false,
-                dueDate: dueDateInput ? dueDateInput : undefined, // Use undefined if no date is provided
-                priority: priorityInput
+                dueDate: dueDate ? dueDate : undefined, // Use undefined if no date is provided
+                priority: priority
             };
             this.items.push(newItem);
             this.saveToLocalStorage();
             this.renderList();
             this.newItemInput.value = '';
-            document.getElementById('dueDate').value = ''; // Clear date input
-            document.getElementById('priority').value = 'low'; // Clear priority input
+            this.dueDateInput.value = ''; // Clear date input
+            this.priorityInput.value = 'low'; // Clear priority input
         }
     }
     toggleComplete(id) {
@@ -62,16 +68,45 @@ class TodoList {
             return;
         }
         this.itemList.innerHTML = '';
-        this.items.forEach(item => {
+        // Get filter and sort options
+        const filter = this.filterSelect.value;
+        const sort = this.sortSelect.value;
+        // Filter items based on completion status
+        let filteredItems = this.items;
+        if (filter === 'completed') {
+            filteredItems = this.items.filter(item => item.completed);
+        }
+        else if (filter === 'incomplete') {
+            filteredItems = this.items.filter(item => !item.completed);
+        }
+        // Sort items based on due date or priority
+        if (sort === 'dueDate') {
+            filteredItems.sort((a, b) => {
+                if (!a.dueDate)
+                    return 1;
+                if (!b.dueDate)
+                    return -1;
+                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+            });
+        }
+        else if (sort === 'priority') {
+            const priorityMap = { low: 1, medium: 2, high: 3 };
+            filteredItems.sort((a, b) => {
+                return priorityMap[a.priority] -
+                    priorityMap[b.priority];
+            });
+        }
+        // Render the filtered and sorted list
+        filteredItems.forEach(item => {
             const li = document.createElement('li');
             const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
             const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
-            const priorityClass = `priority-${item.priority.toLowerCase()}`; // Set priority-based class
+            const priorityClass = `priority-${item.priority.toLowerCase()}`;
             li.innerHTML = `
                 <input type="checkbox" ${item.completed ? 'checked' : ''}>
                 <span class="${item.completed ? 'completed' : ''} ${priorityClass}">${item.text}</span>
                 ${dueDateLabel}
-                <span class="priority-label">[${item.priority}]</span>  <!-- Display priority -->
+                <span class="priority-label">[${item.priority}]</span>
                 <button class="edit">Edit</button>
                 <button class="delete">Delete</button>
             `;

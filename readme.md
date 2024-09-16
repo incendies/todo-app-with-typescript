@@ -75,6 +75,34 @@ typescript-web-app/
 └── README.md
 ```
 
+## Features
+
+1. **Add Tasks**
+   - Users can add new tasks by entering a task name, selecting a due date (optional), and assigning a priority level (low, medium, or high).
+   
+2. **Task Completion**
+   - Tasks can be marked as completed or incomplete by checking/unchecking the checkbox next to each task.
+
+3. **Due Dates**
+   - Each task can have an optional due date. Overdue tasks will be highlighted in red.
+
+4. **Priority Levels**
+   - Tasks can be assigned a priority of "low", "medium", or "high". Tasks with higher priorities are displayed more prominently.
+
+5. **Task Filtering**
+   - You can filter tasks to display:
+     - All tasks
+     - Completed tasks
+     - Incomplete tasks
+
+6. **Task Sorting**
+   - Tasks can be sorted by:
+     - Due Date (earliest due date first)
+     - Priority (high priority tasks first)
+
+7. **Local Storage Persistence**
+   - All tasks are saved to the browser's `localStorage` to ensure the task list persists across page reloads.
+
 ## Contributing to TypeScript Web App
 
 To contribute to TypeScript Web App, follow these steps:

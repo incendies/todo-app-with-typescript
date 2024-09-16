@@ -59,6 +59,22 @@
         <option value="medium">Medium</option>
         <option value="high">High</option>
     </select>
+
+    <!-- Filters and Sorting -->
+    <div id="controls">
+        <select id="filter">
+            <option value="all">All</option>
+            <option value="completed">Completed</option>
+            <option value="incomplete">Incomplete</option>
+        </select>
+
+        <select id="sort">
+            <option value="none">No Sorting</option>
+            <option value="dueDate">Sort by Due Date</option>
+            <option value="priority">Sort by Priority</option>
+        </select>
+    </div>
+
     <ul id="itemList"></ul>
 
     <script src="dist/app.js"></script>
