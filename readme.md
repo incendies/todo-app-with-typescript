@@ -105,7 +105,7 @@ typescript-web-app/
 
 ## Contributing to TypeScript Web App
 
-To contribute to TypeScript Web App, follow these steps:
+To contribute to TypeScript ToDo Web App, follow these steps:
 
 1. Fork this repository.
 2. Create a branch: `git checkout -b <branch_name>`.
