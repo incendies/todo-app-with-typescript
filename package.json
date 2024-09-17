@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "live-server --watch=dist --port=3000",
+    "start": "lite-server",
     "watch": "tsc -w"
   },
   "keywords": [],
@@ -12,8 +12,16 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "live-server": "^1.2.2",
+    "lite-server": "^2.6.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
+  },
+  "lite-server": {
+    "server": {
+      "baseDir": "./public",
+      "routes": {
+        "/dist/*": "./dist"
+      }
+    }
   }
 }

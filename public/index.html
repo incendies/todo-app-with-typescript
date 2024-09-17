@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <input id="newItem" type="text" placeholder="New item">
+    <input id="dueDate" type="date">
+    <select id="priority">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+    </select>
+    <button id="addItem">Add Item</button>
+    <select id="filter">
+        <option value="all">All</option>
+        <option value="completed">Completed</option>
+        <option value="incomplete">Incomplete</option>
+    </select>
+    <select id="sort">
+        <option value="none">None</option>
+        <option value="dueDate">Due Date</option>
+        <option value="priority">Priority</option>
+    </select>
+
+    <ul id="itemList"></ul>
+
+    <script src="dist/app.js"></script>
+</body>
+</html>

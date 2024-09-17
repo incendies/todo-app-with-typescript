@@ -53,20 +53,28 @@ class TodoList {
         const dueDate = this.dueDateInput.value;
         const priority = this.priorityInput.value;
 
+        console.log('New item text:', newItemText);
+        console.log('Due date:', dueDate);
+        console.log('Priority:', priority);
+
         if (newItemText) {
             const newItem: TodoItem = {
                 id: this.nextId++,
                 text: newItemText,
                 completed: false,
-                dueDate: dueDate ? dueDate : undefined,  // Use undefined if no date is provided
-                priority: priority
+                dueDate: dueDate || undefined,
+                priority: priority || 'low'
             };
+            console.log('New item object:', newItem);
             this.items.push(newItem);
             this.saveToLocalStorage();
-            this.renderList();
+            this.renderList();  // Re-render the list to include the new item
             this.newItemInput.value = '';
-            this.dueDateInput.value = '';  // Clear date input
-            this.priorityInput.value = 'low';  // Clear priority input
+            this.dueDateInput.value = '';
+            this.priorityInput.value = 'low';
+            console.log('Item added and list rendered');
+        } else {
+            console.log('No item added: newItemText is empty');
         }
     }
 
@@ -85,6 +93,24 @@ class TodoList {
         this.renderList();
     }
 
+    private editItem(id: number): void {
+        const item = this.items.find(item => item.id === id);
+        if (item) {
+            if (item.editing) {
+                // Save the updated text
+                item.text = this.newItemInput.value.trim();
+                item.editing = false;
+            } else {
+                // Enter edit mode
+                this.newItemInput.value = item.text;
+                this.newItemInput.focus();
+                item.editing = true;
+            }
+            this.saveToLocalStorage();
+            this.renderList();
+        }
+    }
+
     private renderList(): void {
         console.log('renderList called');
         if (!this.itemList) {
@@ -97,6 +123,9 @@ class TodoList {
         // Get filter and sort options
         const filter = this.filterSelect.value;
         const sort = this.sortSelect.value;
+
+        console.log('Filter:', filter);
+        console.log('Sort:', sort);
 
         // Filter items based on completion status
         let filteredItems = this.items;
@@ -116,35 +145,42 @@ class TodoList {
         } else if (sort === 'priority') {
             const priorityMap = { low: 1, medium: 2, high: 3 } as const;
             filteredItems.sort((a, b) => {
-                return priorityMap[a.priority as keyof typeof priorityMap] - 
-                       priorityMap[b.priority as keyof typeof priorityMap];
+                const priorityA = priorityMap[(a.priority || 'low').toLowerCase() as keyof typeof priorityMap] || 0;
+                const priorityB = priorityMap[(b.priority || 'low').toLowerCase() as keyof typeof priorityMap] || 0;
+                return priorityB - priorityA;
             });
         }
 
         // Render the filtered and sorted list
-        filteredItems.forEach(item => {
-            const li = document.createElement('li');
-            const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
-            const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
-            const priorityClass = `priority-${item.priority.toLowerCase()}`;
+        filteredItems.forEach(item => this.appendItemToList(item));
+    }
 
-            li.innerHTML = `
-                <input type="checkbox" ${item.completed ? 'checked' : ''}>
-                <span class="${item.completed ? 'completed' : ''} ${priorityClass}">${item.text}</span>
-                ${dueDateLabel}
-                <span class="priority-label">[${item.priority}]</span>
-                <button class="edit">Edit</button>
-                <button class="delete">Delete</button>
-            `;
+    private appendItemToList(item: TodoItem): void {
+        const li = document.createElement('li');
+        const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
+        const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
+        const priorityClass = `priority-${(item.priority || 'low').toLowerCase()}`;
 
-            const checkbox = li.querySelector('input') as HTMLInputElement;
-            checkbox.addEventListener('change', () => this.toggleComplete(item.id));
+        li.innerHTML = `
+            <input type="checkbox" ${item.completed ? 'checked' : ''}>
+            <span class="${item.completed ? 'completed' : ''} ${priorityClass}">${item.text}</span>
+            ${dueDateLabel}
+            <span class="priority-label">[${item.priority || 'low'}]</span>
+            <button class="edit">${item.editing ? 'Save' : 'Edit'}</button>
+            <button class="delete">Delete</button>
+        `;
 
-            const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
-            deleteButton.addEventListener('click', () => this.deleteItem(item.id));
+        const checkbox = li.querySelector('input') as HTMLInputElement;
+        checkbox.addEventListener('change', () => this.toggleComplete(item.id));
 
-            this.itemList.appendChild(li);
-        });
+        const deleteButton = li.querySelector('.delete') as HTMLButtonElement;
+        deleteButton.addEventListener('click', () => this.deleteItem(item.id));
+
+        const editButton = li.querySelector('.edit') as HTMLButtonElement;
+        editButton.addEventListener('click', () => this.editItem(item.id));
+
+        // Append the new item to the end of the list
+        this.itemList.appendChild(li);
     }
 
     private saveToLocalStorage(): void {
@@ -154,12 +190,23 @@ class TodoList {
     private loadFromLocalStorage(): void {
         const savedItems = localStorage.getItem('todoItems');
         if (savedItems) {
-            this.items = JSON.parse(savedItems);
-            this.nextId = this.items.length ? Math.max(...this.items.map(item => item.id)) + 1 : 1;
+            try {
+                this.items = JSON.parse(savedItems).map((item: TodoItem) => ({
+                    ...item,
+                    priority: item.priority || 'low'  // Set default priority if missing
+                }));
+                this.nextId = this.items.length ? Math.max(...this.items.map(item => item.id)) + 1 : 1;
+            } catch (error) {
+                console.error('Error parsing saved items:', error);
+                this.items = [];
+                this.nextId = 1;
+            }
         }
     }
 }
 
-console.log('TodoList class defined');
-new TodoList();
-console.log('New TodoList instance created');
+// Initialize the TodoList when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded and parsed');
+    new TodoList();
+});
