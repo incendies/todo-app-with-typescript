@@ -15,7 +15,8 @@ class TodoList {
             console.error('One or more elements not found');
             return;
         }
-        this.loadFromLocalStorage();
+        // Initialize with an empty list instead of loading from localStorage
+        this.initializeEmptyList();
         this.addItemButton.addEventListener('click', () => this.addItem());
         this.newItemInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -26,6 +27,12 @@ class TodoList {
         this.sortSelect.addEventListener('change', () => this.renderList());
         console.log('Event listeners added');
         this.renderList();
+    }
+    // New method to initialize an empty list
+    initializeEmptyList() {
+        this.items = [];
+        this.nextId = 1;
+        console.log('Initialized empty todo list');
     }
     addItem() {
         console.log('addItem called');
@@ -131,15 +138,21 @@ class TodoList {
     appendItemToList(item) {
         const li = document.createElement('li');
         const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
-        const dueDateLabel = item.dueDate ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">Due: ${item.dueDate}</span>` : '';
-        const priorityClass = `priority-${(item.priority || 'low').toLowerCase()}`;
+        const dueDateLabel = item.dueDate ? `<span class="ml-2 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-500'}">Due: ${item.dueDate}</span>` : '';
+        const priorityClass = `priority-${item.priority || 'low'}`;
         li.innerHTML = `
-            <input type="checkbox" ${item.completed ? 'checked' : ''}>
-            <span class="${item.completed ? 'completed' : ''} ${priorityClass}">${item.text}</span>
-            ${dueDateLabel}
-            <span class="priority-label">[${item.priority || 'low'}]</span>
-            <button class="edit">${item.editing ? 'Save' : 'Edit'}</button>
-            <button class="delete">Delete</button>
+            <div class="flex items-center justify-between p-2 border rounded bg-gray-50">
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" ${item.completed ? 'checked' : ''} class="form-checkbox h-5 w-5 text-blue-600">
+                    <span class="${item.completed ? 'line-through text-gray-500' : ''} ${priorityClass}">${item.text}</span>
+                    ${dueDateLabel}
+                    <span class="ml-2 font-bold ${priorityClass}">[${item.priority || 'low'}]</span>
+                </div>
+                <div>
+                    <button class="edit px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">${item.editing ? 'Save' : 'Edit'}</button>
+                    <button class="delete px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+                </div>
+            </div>
         `;
         const checkbox = li.querySelector('input');
         checkbox.addEventListener('change', () => this.toggleComplete(item.id));
@@ -153,6 +166,7 @@ class TodoList {
     saveToLocalStorage() {
         localStorage.setItem('todoItems', JSON.stringify(this.items));
     }
+    // This method is no longer needed, but you can keep it for future use if needed
     loadFromLocalStorage() {
         const savedItems = localStorage.getItem('todoItems');
         if (savedItems) {
@@ -169,6 +183,11 @@ class TodoList {
         }
     }
 }
+// Initialize the TodoList when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded and parsed');
+    new TodoList();
+});
 // Initialize the TodoList when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM fully loaded and parsed');

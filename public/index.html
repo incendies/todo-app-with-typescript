@@ -5,29 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .priority-low { color: green; }
+        .priority-medium { color: orange; }
+        .priority-high { color: red; }
+    </style>
 </head>
-<body>
-    <input id="newItem" type="text" placeholder="New item">
-    <input id="dueDate" type="date">
-    <select id="priority">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-    </select>
-    <button id="addItem">Add Item</button>
-    <select id="filter">
-        <option value="all">All</option>
-        <option value="completed">Completed</option>
-        <option value="incomplete">Incomplete</option>
-    </select>
-    <select id="sort">
-        <option value="none">None</option>
-        <option value="dueDate">Due Date</option>
-        <option value="priority">Priority</option>
-    </select>
-
-    <ul id="itemList"></ul>
-
+<body class="bg-gray-100 flex flex-col justify-start items-center min-h-screen p-4 pt-8">
+    <div class="container w-full max-w-lg">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-600 mb-6 text-center">Todo App</h1>
+        <div class="flex flex-col space-y-4 bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <div class="flex flex-col space-y-3">
+                <input id="newItem" type="text" class="w-full px-4 py-3 border rounded shadow-sm text-lg" placeholder="New item">
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input id="dueDate" type="date" class="flex-1 px-4 py-3 border rounded shadow-sm">
+                    <select id="priority" class="flex-1 px-4 py-3 border rounded shadow-sm">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <button id="addItem" class="w-full px-4 py-3 bg-blue-500 text-white rounded shadow hover:bg-blue-600 text-lg">Add Item</button>
+            </div>
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <select id="filter" class="flex-1 px-4 py-3 border rounded shadow-sm">
+                    <option value="all">All</option>
+                    <option value="completed">Completed</option>
+                    <option value="incomplete">Incomplete</option>
+                </select>
+                <select id="sort" class="flex-1 px-4 py-3 border rounded shadow-sm">
+                    <option value="none">None</option>
+                    <option value="dueDate">Due Date</option>
+                    <option value="priority">Priority</option>
+                </select>
+            </div>
+            <ul id="itemList" class="space-y-3"></ul>
+        </div>
+    </div>
     <script src="dist/app.js"></script>
 </body>
 </html>
