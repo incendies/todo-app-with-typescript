@@ -87,7 +87,10 @@ typescript-web-app/
    - Each task can have an optional due date. Overdue tasks will be highlighted in red.
 
 4. **Priority Levels**
-   - Tasks can be assigned a priority of "low", "medium", or "high". Tasks with higher priorities are displayed more prominently.
+   - Tasks can be assigned a priority of "low", "medium", or "high". Tasks are color-coded based on their priority:
+     - Low: Green
+     - Medium: Orange
+     - High: Red
 
 5. **Task Filtering**
    - You can filter tasks to display:
@@ -100,8 +103,11 @@ typescript-web-app/
      - Due Date (earliest due date first)
      - Priority (high priority tasks first)
 
-7. **Local Storage Persistence**
-   - All tasks are saved to the browser's `localStorage` to ensure the task list persists across page reloads.
+7. **Fresh Start**
+   - The app starts with an empty list every time it's opened, allowing for a fresh start in each session.
+
+8. **Responsive Design**
+   - The app is designed to be responsive and work well on both desktop and mobile devices.
 
 ## Contributing to TypeScript Web App
 
@@ -117,8 +123,8 @@ Alternatively, see the GitHub documentation on [creating a pull request](https:/
 
 ## Contact
 
-If you want to contact me, you can reach me. 
+If you want to contact me, you can reach me at [your email or contact information].
 
 ## License
 
-This project uses the following license: [MIT License](<https://github.com/incendies/todo-app-with-typescript/blob/main/LICENSE>).
+This project uses the following license: [MIT License](<https://github.com/yourusername/typescript-web-app/blob/main/LICENSE>).

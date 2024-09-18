@@ -15,8 +15,9 @@ class TodoList {
             console.error('One or more elements not found');
             return;
         }
-        // Initialize with an empty list instead of loading from localStorage
-        this.initializeEmptyList();
+        // Always start with an empty list
+        this.items = [];
+        this.nextId = 1;
         this.addItemButton.addEventListener('click', () => this.addItem());
         this.newItemInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -28,52 +29,33 @@ class TodoList {
         console.log('Event listeners added');
         this.renderList();
     }
-    // New method to initialize an empty list
-    initializeEmptyList() {
-        this.items = [];
-        this.nextId = 1;
-        console.log('Initialized empty todo list');
-    }
     addItem() {
-        console.log('addItem called');
-        const newItemText = this.newItemInput.value.trim();
-        const dueDate = this.dueDateInput.value;
-        const priority = this.priorityInput.value;
-        console.log('New item text:', newItemText);
-        console.log('Due date:', dueDate);
-        console.log('Priority:', priority);
-        if (newItemText) {
+        const text = this.newItemInput.value.trim();
+        if (text) {
             const newItem = {
                 id: this.nextId++,
-                text: newItemText,
+                text: text,
                 completed: false,
-                dueDate: dueDate || undefined,
-                priority: priority || 'low'
+                dueDate: this.dueDateInput.value,
+                priority: this.priorityInput.value,
+                editing: false
             };
-            console.log('New item object:', newItem);
             this.items.push(newItem);
-            this.saveToLocalStorage();
-            this.renderList(); // Re-render the list to include the new item
             this.newItemInput.value = '';
             this.dueDateInput.value = '';
             this.priorityInput.value = 'low';
-            console.log('Item added and list rendered');
-        }
-        else {
-            console.log('No item added: newItemText is empty');
+            this.renderList();
         }
     }
     toggleComplete(id) {
         const item = this.items.find(item => item.id === id);
         if (item) {
             item.completed = !item.completed;
-            this.saveToLocalStorage();
             this.renderList();
         }
     }
     deleteItem(id) {
         this.items = this.items.filter(item => item.id !== id);
-        this.saveToLocalStorage();
         this.renderList();
     }
     editItem(id) {
@@ -90,50 +72,17 @@ class TodoList {
                 this.newItemInput.focus();
                 item.editing = true;
             }
-            this.saveToLocalStorage();
             this.renderList();
         }
     }
     renderList() {
-        console.log('renderList called');
-        if (!this.itemList) {
-            console.error('itemList is null');
-            return;
-        }
+        // Clear the existing list
         this.itemList.innerHTML = '';
-        // Get filter and sort options
-        const filter = this.filterSelect.value;
-        const sort = this.sortSelect.value;
-        console.log('Filter:', filter);
-        console.log('Sort:', sort);
-        // Filter items based on completion status
-        let filteredItems = this.items;
-        if (filter === 'completed') {
-            filteredItems = this.items.filter(item => item.completed);
-        }
-        else if (filter === 'incomplete') {
-            filteredItems = this.items.filter(item => !item.completed);
-        }
-        // Sort items based on due date or priority
-        if (sort === 'dueDate') {
-            filteredItems.sort((a, b) => {
-                if (!a.dueDate)
-                    return 1;
-                if (!b.dueDate)
-                    return -1;
-                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-            });
-        }
-        else if (sort === 'priority') {
-            const priorityMap = { low: 1, medium: 2, high: 3 };
-            filteredItems.sort((a, b) => {
-                const priorityA = priorityMap[(a.priority || 'low').toLowerCase()] || 0;
-                const priorityB = priorityMap[(b.priority || 'low').toLowerCase()] || 0;
-                return priorityB - priorityA;
-            });
-        }
-        // Render the filtered and sorted list
-        filteredItems.forEach(item => this.appendItemToList(item));
+        // Filter and sort items
+        let filteredItems = this.filterItems(this.items);
+        filteredItems = this.sortItems(filteredItems);
+        // Render the filtered and sorted items
+        filteredItems.forEach((item) => this.appendItemToList(item));
     }
     appendItemToList(item) {
         const li = document.createElement('li');
@@ -163,31 +112,36 @@ class TodoList {
         // Append the new item to the end of the list
         this.itemList.appendChild(li);
     }
-    saveToLocalStorage() {
-        localStorage.setItem('todoItems', JSON.stringify(this.items));
+    filterItems(items) {
+        const filterValue = this.filterSelect.value;
+        switch (filterValue) {
+            case 'completed':
+                return items.filter(item => item.completed);
+            case 'incomplete':
+                return items.filter(item => !item.completed);
+            default:
+                return items;
+        }
     }
-    // This method is no longer needed, but you can keep it for future use if needed
-    loadFromLocalStorage() {
-        const savedItems = localStorage.getItem('todoItems');
-        if (savedItems) {
-            try {
-                this.items = JSON.parse(savedItems).map((item) => (Object.assign(Object.assign({}, item), { priority: item.priority || 'low' // Set default priority if missing
-                 })));
-                this.nextId = this.items.length ? Math.max(...this.items.map(item => item.id)) + 1 : 1;
-            }
-            catch (error) {
-                console.error('Error parsing saved items:', error);
-                this.items = [];
-                this.nextId = 1;
-            }
+    sortItems(items) {
+        const sortValue = this.sortSelect.value;
+        switch (sortValue) {
+            case 'dueDate':
+                return items.sort((a, b) => {
+                    if (!a.dueDate)
+                        return 1;
+                    if (!b.dueDate)
+                        return -1;
+                    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+                });
+            case 'priority':
+                const priorityOrder = { high: 0, medium: 1, low: 2 };
+                return items.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+            default:
+                return items;
         }
     }
 }
-// Initialize the TodoList when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM fully loaded and parsed');
-    new TodoList();
-});
 // Initialize the TodoList when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM fully loaded and parsed');
