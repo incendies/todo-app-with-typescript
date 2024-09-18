@@ -80,8 +80,14 @@ class TodoList {
     }
 
     private deleteItem(id: number): void {
-        this.items = this.items.filter(item => item.id !== id);
-        this.renderList();
+        const li = this.itemList.querySelector(`li[data-id="${id}"]`);
+        if (li) {
+            li.classList.add('fadeOut');
+            setTimeout(() => {
+                this.items = this.items.filter(item => item.id !== id);
+                this.renderList();
+            }, 500); // Delay for the fade-out animation
+        }
     }
 
     private editItem(id: number): void {
@@ -115,6 +121,8 @@ class TodoList {
 
     private appendItemToList(item: TodoItem): void {
         const li = document.createElement('li');
+        li.setAttribute('data-id', item.id.toString()); // Add unique ID for each item
+        
         const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
         const dueDateLabel = item.dueDate ? `<span class="ml-2 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-500'}">Due: ${item.dueDate}</span>` : '';
         const priorityClass = `priority-${item.priority || 'low'}`;
@@ -182,4 +190,3 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM fully loaded and parsed');
     new TodoList();
 });
-
