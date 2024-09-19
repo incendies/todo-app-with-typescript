@@ -1,4 +1,4 @@
-![Typescript Todo Demo](./typescript-todo-list.jpeg)
+![Typescript Todo Demo](./todo-app-screenshot.jpg)
 
 # TypeScript ToDo App
 
