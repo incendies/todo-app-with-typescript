@@ -104,7 +104,7 @@ typescript-web-app/
      - Priority (high priority tasks first)
 
 7. **Fresh Start**
-   - The app starts with an empty list every time it's opened, allowing for a fresh start in each session.
+   - The app starts with an empty list every time it's opened, allowing for a fresh start in each session for your need.
 
 8. **Responsive Design**
    - The app is designed to be responsive and work well on both desktop and mobile devices.
