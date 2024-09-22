@@ -11,6 +11,8 @@ class TodoList {
         this.priorityInput = document.getElementById('priority');
         this.filterSelect = document.getElementById('filter');
         this.sortSelect = document.getElementById('sort');
+        this.searchInput = document.getElementById('search'); // {{ edit_3 }}
+        this.searchInput.addEventListener('input', () => this.renderList()); // {{ edit_4 }}
         if (!this.itemList || !this.newItemInput || !this.addItemButton || !this.dueDateInput || !this.priorityInput || !this.filterSelect || !this.sortSelect) {
             console.error('One or more elements not found');
             return;
@@ -87,6 +89,7 @@ class TodoList {
         // Filter and sort items
         let filteredItems = this.filterItems(this.items);
         filteredItems = this.sortItems(filteredItems);
+        filteredItems = this.searchItems(filteredItems); // {{ edit_5 }}
         // Render the filtered and sorted items
         filteredItems.forEach((item) => this.appendItemToList(item));
     }
@@ -147,6 +150,10 @@ class TodoList {
             default:
                 return items;
         }
+    }
+    searchItems(items) {
+        const searchValue = this.searchInput.value.toLowerCase();
+        return items.filter(item => item.text.toLowerCase().includes(searchValue));
     }
 }
 // Initialize the TodoList when the DOM is fully loaded

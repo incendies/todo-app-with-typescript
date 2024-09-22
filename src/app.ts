@@ -19,6 +19,7 @@ class TodoList {
     private filterSelect: HTMLSelectElement;
     private sortSelect: HTMLSelectElement;
     private nextId: number = 1;
+    private searchInput: HTMLInputElement; // {{ edit_2 }}
 
     constructor() {
         console.log('TodoList constructor called');
@@ -29,6 +30,8 @@ class TodoList {
         this.priorityInput = document.getElementById('priority') as HTMLSelectElement;
         this.filterSelect = document.getElementById('filter') as HTMLSelectElement;
         this.sortSelect = document.getElementById('sort') as HTMLSelectElement;
+        this.searchInput = document.getElementById('search') as HTMLInputElement; // {{ edit_3 }}
+        this.searchInput.addEventListener('input', () => this.renderList()); // {{ edit_4 }}
 
         if (!this.itemList || !this.newItemInput || !this.addItemButton || !this.dueDateInput || !this.priorityInput || !this.filterSelect || !this.sortSelect) {
             console.error('One or more elements not found');
@@ -114,6 +117,7 @@ class TodoList {
         // Filter and sort items
         let filteredItems = this.filterItems(this.items);
         filteredItems = this.sortItems(filteredItems);
+        filteredItems = this.searchItems(filteredItems); // {{ edit_5 }}
 
         // Render the filtered and sorted items
         filteredItems.forEach((item: TodoItem) => this.appendItemToList(item));
@@ -182,6 +186,11 @@ class TodoList {
             default:
                 return items;
         }
+    }
+
+    private searchItems(items: TodoItem[]): TodoItem[] { // {{ edit_6 }}
+        const searchValue = this.searchInput.value.toLowerCase();
+        return items.filter(item => item.text.toLowerCase().includes(searchValue));
     }
 }
 
